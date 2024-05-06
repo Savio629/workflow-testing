@@ -6,7 +6,7 @@ const path = require('path');
 // Function to get dropdown options
 async function getOptions(page, selector) {
     return await page.evaluate((selector) => {
-        let options = Array.from(document.querySelector(selector).options);
+        const options = Array.from(document.querySelector(selector).options);
         return options.map(option => ({
             text: option.text,
             value: option.value
@@ -14,13 +14,7 @@ async function getOptions(page, selector) {
     }, selector);
 }
 
-async function getValue(page, selector) {
-    return await page.evaluate((selector) => {
-        const selectedOption = document.querySelector(selector).value;
-        return selectedOption;
-    }, selector);
-}
-
+// Function to scrape data
 async function scrapeData() {
     try {
         const browser = await puppeteer.launch({ headless: true });
@@ -39,8 +33,8 @@ async function scrapeData() {
         // Fetch dropdown options for the year
         const years = await getOptions(page, '#CPHPage_ddFinyear');
 
-        // Filter out the "-Select Year-" option
-        const validYears = years.filter(year => year.value !== "-1");
+        // Filter out the "-Select Year-" option and the specific year "2024-2025"
+        const validYears = years.filter(year => year.value !== "-1" && year.text !== "2024-2025");
 
         for (let year of validYears) {
             const yearFolder = path.join(dataDir, year.text.replace(/[\\/:*?"<>|]/g, '-'));
@@ -51,7 +45,7 @@ async function scrapeData() {
             await page.select('#CPHPage_ddFinyear', year.value);
             await new Promise(resolve => setTimeout(resolve, 2000));
 
-            // Fetch dropdown options
+            // Fetch dropdown options for states
             const states = await getOptions(page, '#CPHPage_ddState');
 
             for (let state of states) {
@@ -62,6 +56,7 @@ async function scrapeData() {
 
                 await page.select('#CPHPage_ddState', state.value);
                 await new Promise(resolve => setTimeout(resolve, 2000));
+                
                 let districts = await getOptions(page, '#CPHPage_ddDistrict');
 
                 for (let district of districts) {
@@ -121,4 +116,3 @@ async function scrapeData() {
 }
 
 scrapeData();
- 
