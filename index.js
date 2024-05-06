@@ -83,8 +83,8 @@ async function scrapeData() {
                             const categoryNameForFile = category.text.replace(/[\\/:*?"<>|]/g, '-');
                             await page.select('#CPHPage_ddCategory', category.value);
                             await page.click('#CPHPage_btnShow'); // Assume there's a Show button to refresh the data
-                            await new Promise(resolve => setTimeout(resolve, 2000));
-                            await page.waitForSelector('#tableReportTable');
+                            await new Promise(resolve => setTimeout(resolve, 5000));
+                            await page.waitForSelector('#tableReportTable', { timeout: 5000 }).catch(() => console.log('Table not found, proceeding to next category'));
 
                             const data = await page.evaluate(() => {
                                 const rows = Array.from(document.querySelectorAll('#tableReportTable tr'));
