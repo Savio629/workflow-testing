@@ -43,7 +43,7 @@ async function scrapeData() {
             }
 
             await page.select('#CPHPage_ddFinyear', year.value);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 500));
 
             // Fetch dropdown options for states
             const states = await getOptions(page, '#CPHPage_ddState');
@@ -55,7 +55,7 @@ async function scrapeData() {
                 }
 
                 await page.select('#CPHPage_ddState', state.value);
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 
                 let districts = await getOptions(page, '#CPHPage_ddDistrict');
 
@@ -66,7 +66,7 @@ async function scrapeData() {
                     }
 
                     await page.select('#CPHPage_ddDistrict', district.value);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     let blocks = await getOptions(page, '#CPHPage_ddBlock');
 
                     for (let block of blocks) {
@@ -76,7 +76,7 @@ async function scrapeData() {
                         }
 
                         await page.select('#CPHPage_ddBlock', block.value);
-                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        await new Promise(resolve => setTimeout(resolve, 500));
                         let categories = await getOptions(page, '#CPHPage_ddCategory');
 
                         for (let category of categories) {
