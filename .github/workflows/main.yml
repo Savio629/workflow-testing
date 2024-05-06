@@ -30,7 +30,7 @@ jobs:
     - name: Commit and push updated CSV (if applicable)
       run: |
         git config --local user.email "diassavio629@gmail.com"
-        git config --local user.name "Savio Dias"
+        git config --local user.name "Savio629"
         git add data
         git commit -m "Update data folder"
         git push
