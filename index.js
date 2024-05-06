@@ -88,7 +88,7 @@ async function scrapeData() {
                             const categoryNameForFile = category.text.replace(/[\\/:*?"<>|]/g, '-');
                             await page.select('#CPHPage_ddCategory', category.value);
                             await page.click('#CPHPage_btnShow'); // Assume there's a Show button to refresh the data
-                            await new Promise(resolve => setTimeout(resolve, 2000));
+                            await new Promise(resolve => setTimeout(resolve, 5000));
                             await page.waitForSelector('#tableReportTable');
 
                             const data = await page.evaluate(() => {
