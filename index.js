@@ -28,7 +28,7 @@ async function scrapeData() {
         }
 
         const years = await getOptions(page, '#CPHPage_ddFinyear');
-        const validYears = years.filter(year => year.value !== "-1" && year.text !== "2024-2025");
+        const validYears = years.filter(year => year.value !== "-1");
 
         for (let year of validYears) {
             const yearFolder = path.join(dataDir, year.text.replace(/[\\/:*?"<>|]/g, '-'));
