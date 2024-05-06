@@ -50,4 +50,4 @@ async function scrapeData() {
     }
 }
 
-scrapeData();
+scrapeData(); 
