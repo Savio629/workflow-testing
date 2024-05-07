@@ -20,12 +20,11 @@ async function getValue(page, selector) {
         return selectedOption;
     }, selector);
 }
-
 async function scrapeData() {
     try {
-        const browser = await puppeteer.launch({ headless: true });
+        const browser = await puppeteer.launch({ headless: false });
         const page = await browser.newPage();
-        await page.goto('https://ejalshakti.gov.in/JJM/JJMReports/BasicInformation/JJMRep_AbstractData_D.aspx?Istate=9or6Umv%2Bgig%3D&IAgency=9or6Umv%2Bgig%3D&IDistrict=gMqMutIC0u0%3D&Iblock=gMqMutIC0u0%3D&IFinyear=joOf9Wxy6nf0qdH7vFm42w%3D%3D&ICategory=5C1KxeqUjmo%3D', { waitUntil: 'networkidle0' });
+        await page.goto('https://ejalshakti.gov.in/JJM/JJMReports/BasicInformation/JJMRep_AbstractData_D.aspx', { waitUntil: 'networkidle0' });
 
         await page.waitForSelector('#CPHPage_ddFinyear'); // Wait for the first dropdown to appear
 
@@ -36,12 +35,11 @@ async function scrapeData() {
             fs.mkdirSync(dataDir);
         }
 
-
         // Fetch dropdown options for the year
         const years = await getOptions(page, '#CPHPage_ddFinyear');
 
         // Filter out the "-Select Year-" option
-        const validYears = years.filter(year => year.value !== "-1");
+        const validYears = years.filter(year => year.value === "2023-2024" || year.value === "2024-2025");
 
         for (let year of validYears) {
             const yearFolder = path.join(dataDir, year.text.replace(/[\\/:*?"<>|]/g, '-'));
@@ -52,16 +50,21 @@ async function scrapeData() {
             await page.select('#CPHPage_ddFinyear', year.value);
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            // Fetch dropdown options
-            const states = await getOptions(page, '#CPHPage_ddState');
+            // Select Odisha from the state dropdown
+            await page.select('#CPHPage_ddState', '24');
+            await new Promise(resolve => setTimeout(resolve, 500));
 
-            for (let state of states) {
-                const stateFolder = path.join(yearFolder, state.text.replace(/[\\/:*?"<>|]/g, '-'));
+            // Fetch dropdown options
+            // const states = await getOptions(page, '#CPHPage_ddState');
+            const state = await page.select('#CPHPage_ddState', '24');
+            // console.log(state.text);
+            // for (let state of states) {
+                const stateFolder = path.join(yearFolder, 'Odisha');
                 if (!fs.existsSync(stateFolder)) {
                     fs.mkdirSync(stateFolder);
                 }
-                console.log(state.text);
-                await page.select('#CPHPage_ddState', state.value);
+                console.log('Odisha');
+                // await page.select('#CPHPage_ddState', '24');
                 await new Promise(resolve => setTimeout(resolve, 500));
                 let districts = await getOptions(page, '#CPHPage_ddDistrict');
 
@@ -108,45 +111,44 @@ async function scrapeData() {
                                     // Handle radio buttons if available
                                     for (let radioButton of radioButtons) {
                                         try {
-                                        await page.evaluate((id) => {
-                                            const element = document.getElementById(id);
-                                            if (element) {
-                                                element.click();
-                                            } else {
-                                                throw new Error(`Element with id ${id} not found.`);
-                                            }
+                                            await page.evaluate((id) => {
+                                                const element = document.getElementById(id);
+                                                if (element) {
+                                                    element.click();
+                                                } else {
+                                                    throw new Error(`Element with id ${id} not found.`);
+                                                }
                                             }, radioButton.id);
 
-                                        // Click on the "Show" button
-                                        await page.click('#CPHPage_btnShow');
-                                        await new Promise(resolve => setTimeout(resolve, 5000));
+                                            // Click on the "Show" button
+                                            await page.click('#CPHPage_btnShow');
+                                            await new Promise(resolve => setTimeout(resolve, 5000));
 
-                                        // Wait for the data to load
-                                        await page.waitForSelector('#tableReportTable', { timeout: 5000 }).catch(() => console.log('Table not found, proceeding to next radio button'));
+                                            // Wait for the data to load
+                                            await page.waitForSelector('#tableReportTable', { timeout: 5000 }).catch(() => console.log('Table not found, proceeding to next radio button'));
 
-                                        const data = await page.evaluate(() => {
-                                            const rows = Array.from(document.querySelectorAll('#tableReportTable tr'));
-                                            return rows.map(row => {
-                                                const columns = row.querySelectorAll('th, td');
-                                                return Array.from(columns, column => column.innerText.trim().replace(/\n/g, ' '));
+                                            const data = await page.evaluate(() => {
+                                                const rows = Array.from(document.querySelectorAll('#tableReportTable tr'));
+                                                return rows.map(row => {
+                                                    const columns = row.querySelectorAll('th, td');
+                                                    return Array.from(columns, column => column.innerText.trim().replace(/\n/g, ' '));
+                                                });
                                             });
-                                        });
 
-                                        // Save to CSV file using radio button label instead of value
-                                        const csvFilePath = path.join(blockFolder, `${radioButton.label}.csv`);
-                                        stringify(data, (err, output) => {
-                                            if (err) throw err;
-                                            fs.writeFile(csvFilePath, output, (err) => {
+                                            // Save to CSV file using radio button label instead of value
+                                            const csvFilePath = path.join(blockFolder, `${radioButton.label}.csv`);
+                                            stringify(data, (err, output) => {
                                                 if (err) throw err;
-                                                // console.log(`${radioButton.label}.csv saved in ${block.text} folder.`);
+                                                fs.writeFile(csvFilePath, output, (err) => {
+                                                    if (err) throw err;
+                                                    // console.log(`${radioButton.label}.csv saved in ${block.text} folder.`);
+                                                });
                                             });
-                                        });
-                                    } catch (error) {
-                                        console.error(error);
-                                        continue;
+                                        } catch (error) {
+                                            console.error(error);
+                                            continue;
+                                        }
                                     }
-                                } }else {
-                                    // console.log('No radio buttons found. Skipping...');
                                 }
                             } else {
                                 // Handle categories if radio buttons are not present
@@ -177,7 +179,7 @@ async function scrapeData() {
                         }
                     }
                 }
-            }
+            // }
         }
 
         await browser.close();
