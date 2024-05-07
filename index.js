@@ -25,7 +25,7 @@ async function scrapeData() {
     try {
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
-        await page.goto('https://ejalshakti.gov.in/JJM/JJMReports/BasicInformation/JJMRep_AbstractData_D.aspx', { waitUntil: 'networkidle0' });
+        await page.goto('https://ejalshakti.gov.in/JJM/JJMReports/BasicInformation/JJMRep_AbstractData_D.aspx?Istate=9or6Umv%2Bgig%3D&IAgency=9or6Umv%2Bgig%3D&IDistrict=gMqMutIC0u0%3D&Iblock=gMqMutIC0u0%3D&IFinyear=joOf9Wxy6nf0qdH7vFm42w%3D%3D&ICategory=5C1KxeqUjmo%3D', { waitUntil: 'networkidle0' });
 
         await page.waitForSelector('#CPHPage_ddFinyear'); // Wait for the first dropdown to appear
 
