@@ -1,9 +1,9 @@
 {
     "dependencies": {
-      "csv-stringify": "^6.4.6",
-      "json2csv": "^6.0.0-alpha.2",
-      "mathjs": "^12.4.2",
-      "puppeteer": "^22.7.1"
+        "csv-stringify": "^6.4.6",
+        "json2csv": "^6.0.0-alpha.2",
+        "mathjs": "^12.4.2",
+        "puppeteer": "^22.7.1",
+        "puppeteer-cluster": "^0.24.0"
     }
-  }
-  
+}
