@@ -39,9 +39,9 @@ async function scrapeData() {
         const years = await getOptions(page, '#CPHPage_ddFinyear');
 
         // Filter out the "-Select Year-" option
-        const year = years.filter(year => year.value === "2023-2024" );
+        const validYears = years.filter(year => year.value === "2023-2024" );
 
-        // for (let year of validYears) {
+         for (let year of validYears) {
             const yearFolder = path.join(dataDir, year.text.replace(/[\\/:*?"<>|]/g, '-'));
             if (!fs.existsSync(yearFolder)) {
                 fs.mkdirSync(yearFolder);
@@ -179,7 +179,7 @@ async function scrapeData() {
                         }
                     }
                 }
-            // }
+             }
         // }
 
         await browser.close();
