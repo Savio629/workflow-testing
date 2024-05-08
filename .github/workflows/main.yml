@@ -1,4 +1,4 @@
-name: Puppeteer Workflow
+name: Puppeteer Workflow 1
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
       run: npm install
     
     - name: Run Puppeteer script
-      run: node index.js
+      run: node index1.js 0 6
       
     - name: Commit and push updated CSV (if applicable)
       run: |
