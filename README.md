@@ -14,7 +14,6 @@ https://github.com/Savio629/workflow-testing/actions/runs/8982203324/job/2466928
 
 ### The recent pr does the following : 
 
-
 -  The script successfully interacts with various dropdown menus, including those for years, states, districts, blocks, and categories. It adapts dynamically to fetch pertinent data based on the selected options at each level.
 
 -  It organizes the data by creating a nested directory structure for each selected year, state, district, and block, systematically storing CSV files in their respective folders.
