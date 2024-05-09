@@ -33,6 +33,7 @@ jobs:
         git config --local user.name "Savio629"
         git add data
         git commit -m "Update data folder"
+        git pull origin main
         git push https://${{ secrets.GH_TOKEN }}@github.com/Savio629/workflow-testing.git
       if: success()
 
