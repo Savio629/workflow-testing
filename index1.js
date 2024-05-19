@@ -83,7 +83,7 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
             };
         });
 
-        const baseDir = path.join(__dirname, 'data', state, district, block, panchayat, village);
+        const baseDir = path.join(__dirname, 'dataVillages', state, district, block, panchayat, village);
         await saveToCsv([populationData], baseDir, 'population.csv');
         await saveToCsv([connectionData], baseDir, 'connection_information.csv');
     }
