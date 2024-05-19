@@ -13,11 +13,11 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
 }
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false }); // Set to true to run headless
+    const browser = await puppeteer.launch({ headless: true }); 
     const page = await browser.newPage();
     await page.goto('https://ejalshakti.gov.in/jjm/JJMReports/profiles/rpt_VillageProfile.aspx', { waitUntil: 'networkidle2' });
 
-    // Selectors for the dropdowns and show button
+    
     const selectors = {
         state: '#CPHPage_ddState',
         district: '#CPHPage_ddDistrict',
@@ -30,7 +30,7 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
     // Helper function to select an option and wait
     async function selectOption(selector, value, waitTime = 2000) {
         await page.select(selector, value);
-        await new Promise(resolve => setTimeout(resolve, waitTime)); // Wait for specified time for the page to load
+        await new Promise(resolve => setTimeout(resolve, waitTime)); 
     }
 
     // Function to get dropdown options excluding the default
@@ -61,7 +61,7 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
     // Scrape data and save to CSV
     async function scrapeAndSaveData(state, district, block, panchayat, village) {
         await page.click(selectors.showButton);
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 5 seconds for data to load
+        await new Promise(resolve => setTimeout(resolve, 5000)); 
 
         // Scrape population data
         const populationData = await page.evaluate(() => {
