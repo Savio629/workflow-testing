@@ -17,7 +17,6 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
     const page = await browser.newPage();
     await page.goto('https://ejalshakti.gov.in/jjm/JJMReports/profiles/rpt_VillageProfile.aspx', { waitUntil: 'networkidle2' });
 
-    
     const selectors = {
         state: '#CPHPage_ddState',
         district: '#CPHPage_ddDistrict',
@@ -27,13 +26,11 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
         showButton: '#CPHPage_btnShow'
     };
 
-    // Helper function to select an option and wait
-    async function selectOption(selector, value, waitTime = 2000) {
+    async function selectOption(selector, value, waitTime = 3000) {
         await page.select(selector, value);
         await new Promise(resolve => setTimeout(resolve, waitTime)); 
     }
 
-    // Function to get dropdown options excluding the default
     async function getOptions(selector) {
         return await page.evaluate((selector) => {
             const options = Array.from(document.querySelector(selector).options);
@@ -41,14 +38,12 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
         }, selector);
     }
 
-    // Create directories if not exist
     function createDirectory(dir) {
         if (!fs.existsSync(dir)){
             fs.mkdirSync(dir, { recursive: true });
         }
     }
 
-    // Save data to CSV
     async function saveToCsv(data, dir, filename) {
         createDirectory(dir);
         const csvWriter = createCsvWriter({
@@ -58,55 +53,73 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
         await csvWriter.writeRecords(data);
     }
 
-    // Scrape data and save to CSV
     async function scrapeAndSaveData(state, district, block, panchayat, village) {
-        await page.click(selectors.showButton);
-        await new Promise(resolve => setTimeout(resolve, 5000)); 
+        try {
+            await page.click(selectors.showButton);
+            await new Promise(resolve => setTimeout(resolve, 7000)); 
 
-        // Scrape population data
-        const populationData = await page.evaluate(() => {
-            return {
-                totalPopulation: document.querySelector('#CPHPage_lblToptalPop').innerText.trim(),
-                scPopulation: document.querySelector('#CPHPage_lblSCPop').innerText.trim(),
-                stPopulation: document.querySelector('#CPHPage_lblSTPop').innerText.trim(),
-                genPopulation: document.querySelector('#CPHPage_lblGENPop').innerText.trim()
-            };
-        });
+            const populationData = await page.evaluate(() => {
+                const totalPopulation = document.querySelector('#CPHPage_lblToptalPop')?.innerText.trim();
+                const scPopulation = document.querySelector('#CPHPage_lblSCPop')?.innerText.trim();
+                const stPopulation = document.querySelector('#CPHPage_lblSTPop')?.innerText.trim();
+                const genPopulation = document.querySelector('#CPHPage_lblGENPop')?.innerText.trim();
 
-        // Scrape connection information
-        const connectionData = await page.evaluate(() => {
-            return {
-                totalHouseholds: document.querySelector('#CPHPage_lblHouseHolds').innerText.trim(),
-                tapConnections: document.querySelector('#CPHPage_lblHouseConnection').innerText.trim(),
-                pwsAvailable: document.querySelector('#CPHPage_lblIsPWS').innerText.trim(),
-                jjmStatus: document.querySelector('#CPHPage_lblvillagestatus').innerText.trim()
-            };
-        });
+                if (!totalPopulation || !scPopulation || !stPopulation || !genPopulation) {
+                    throw new Error('Population data not available');
+                }
 
-        const baseDir = path.join(__dirname, 'dataVillages', state, district, block, panchayat, village);
-        await saveToCsv([populationData], baseDir, 'population.csv');
-        await saveToCsv([connectionData], baseDir, 'connection_information.csv');
+                return {
+                    totalPopulation,
+                    scPopulation,
+                    stPopulation,
+                    genPopulation
+                };
+            });
+
+            const connectionData = await page.evaluate(() => {
+                const totalHouseholds = document.querySelector('#CPHPage_lblHouseHolds')?.innerText.trim();
+                const tapConnections = document.querySelector('#CPHPage_lblHouseConnection')?.innerText.trim();
+                const pwsAvailable = document.querySelector('#CPHPage_lblIsPWS')?.innerText.trim();
+                const jjmStatus = document.querySelector('#CPHPage_lblvillagestatus')?.innerText.trim();
+
+                if (!totalHouseholds || !tapConnections || !pwsAvailable || !jjmStatus) {
+                    throw new Error('Connection data not available');
+                }
+
+                return {
+                    totalHouseholds,
+                    tapConnections,
+                    pwsAvailable,
+                    jjmStatus
+                };
+            });
+
+            const baseDir = path.join(__dirname, 'dataVillages', state, district, block, panchayat, village);
+            await saveToCsv([populationData], baseDir, 'population.csv');
+            await saveToCsv([connectionData], baseDir, 'connection_information.csv');
+        } catch (error) {
+            console.error(`Skipping village ${village}: ${error.message}`);
+        }
     }
 
-    // Set the state to Odisha
-    const odishaValue = '24'; // Odisha value from the dropdown
-    await selectOption(selectors.state, odishaValue, 2000);
+    const odishaValue = '24'; 
+    await selectOption(selectors.state, odishaValue, 3000);
 
     const districts = await getOptions(selectors.district);
     const districtsToProcess = districts.slice(startIndex - 1, endIndex);
 
     for (const district of districtsToProcess) {
         console.log(`Starting district: ${district.text}`);
-        await selectOption(selectors.district, district.value, 2000);
+        await selectOption(selectors.district, district.value, 3000);
         const blocks = await getOptions(selectors.block);
         for (const block of blocks) {
-            await selectOption(selectors.block, block.value, 2000);
+            await selectOption(selectors.block, block.value, 3000);
             const panchayats = await getOptions(selectors.panchayat);
             for (const panchayat of panchayats) {
-                await selectOption(selectors.panchayat, panchayat.value, 2000);
+                await selectOption(selectors.panchayat, panchayat.value, 3000);
                 const villages = await getOptions(selectors.village);
                 for (const village of villages) {
-                    await selectOption(selectors.village, village.value, 2000);
+                    await selectOption(selectors.village, village.value, 3000);
                     await scrapeAndSaveData('Odisha', district.text, block.text, panchayat.text, village.text);
                 }
             }
