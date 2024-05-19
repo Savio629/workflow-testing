@@ -31,9 +31,9 @@ jobs:
       run: |
         git config --local user.email "diassavio629@gmail.com"
         git config --local user.name "Savio629"
-        git add data
+        git add dataVillages
         git commit -m "Update data folder"
-        git pull origin main
+        git pull --no-rebase
         git push https://${{ secrets.GH_TOKEN }}@github.com/Savio629/workflow-testing.git
       if: success()
 
