@@ -13,7 +13,7 @@ if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex < startIn
 }
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true }); 
+    const browser = await puppeteer.launch({ headless: false }); 
     const page = await browser.newPage();
     await page.goto('https://ejalshakti.gov.in/jjm/JJMReports/profiles/rpt_VillageProfile.aspx', { waitUntil: 'networkidle2' });
 
