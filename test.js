@@ -25,7 +25,7 @@ async function scrapeData() {
 
         await page.waitForSelector('#CPHPage_ddFinyear');
         
-        const dataDir = path.join(__dirname, 'data-villages');
+        const dataDir = path.join(__dirname, 'dataVillages');
         if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir);
         }
