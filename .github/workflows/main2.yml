@@ -25,7 +25,7 @@ jobs:
       run: npm install
     
     - name: Run Puppeteer script
-      run: node index1.js 13 18
+      run: node test.js 13 18
       
     - name: Commit and push updated CSV (if applicable)
       run: |
