@@ -41,12 +41,12 @@ async function scrapeData() {
             const district = await page.evaluate((index) => {
                 const selector = `#CPHPage_rpt_lnkbtn_${index}`;
                 const selectedOption = document.querySelector(selector);
-                return selectedOption ? selectedOption.text : 'Unknown';
+                return selectedOption ? selectedOption.text : `Unknown_${index}`;
             }, i);
 
             console.log(`Processing data for district: ${district}`);
 
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 5000));
             await page.click(`#CPHPage_rpt_Village_${i}`);
             await new Promise(resolve => setTimeout(resolve, 7000));
 
